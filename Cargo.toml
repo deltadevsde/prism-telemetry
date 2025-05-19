@@ -1,0 +1,21 @@
+[package]
+name = "prism-telemetry"
+version = "0.1.0"
+edition = "2024"
+description = "Prism Telemetry Library"
+license = "MIT"
+
+[dependencies]
+opentelemetry = "0.29.1"
+opentelemetry_sdk = "0.29.0"
+opentelemetry-otlp = "0.29.0"
+opentelemetry-appender-tracing = "0.29.1"
+pyroscope = "0.5.8"
+pyroscope_pprofrs = "0.2.10"
+tracing = { version = "0.1.41", features = ["std"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "registry", "std", "fmt"] }
+
+base64 = "0.22.0"
+serde = { version = "1.0.151", features = ["derive"] }
+lazy_static = "1.4.0"
+parking_lot = "0.12"
