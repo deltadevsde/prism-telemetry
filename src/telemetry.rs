@@ -1,31 +1,39 @@
-use crate::metrics;
-use crate::logs;
 use crate::config::TelemetryConfig;
-use opentelemetry_sdk::Resource;
-use opentelemetry_sdk::metrics::SdkMeterProvider;
-use opentelemetry_sdk::logs::SdkLoggerProvider;
+use crate::logs;
+use crate::metrics;
 use crate::metrics::init_metrics;
-use opentelemetry::KeyValue;
-use std::sync::Mutex;
 use lazy_static::lazy_static;
+use opentelemetry::KeyValue;
+use opentelemetry_sdk::Resource;
+use opentelemetry_sdk::logs::SdkLoggerProvider;
+use opentelemetry_sdk::metrics::SdkMeterProvider;
 use std::error::Error;
+use std::sync::Mutex;
 use tracing::info;
 
 lazy_static! {
     static ref GLOBAL_ATTRIBUTES: Mutex<Vec<KeyValue>> = Mutex::new(Vec::new());
 }
 
-pub fn init_telemetry(config: &TelemetryConfig, resource: Resource) -> Result<(Option<SdkMeterProvider>, Option<SdkLoggerProvider>), Box<dyn Error>> {
-    info!("Initializing telemetry with configuration: metrics_enabled={}, logs_enabled={}",
-        config.metrics.enabled, config.logs.enabled);
+pub fn init_telemetry(
+    config: &TelemetryConfig,
+    resource: Resource,
+) -> Result<(Option<SdkMeterProvider>, Option<SdkLoggerProvider>), Box<dyn Error>> {
+    info!(
+        "Initializing telemetry with configuration: metrics_enabled={}, logs_enabled={}",
+        config.metrics.enabled, config.logs.enabled
+    );
 
     // Initialize metrics if enabled
     let meter_provider = if config.metrics.enabled {
         match init_metrics(&config.metrics, resource.clone()) {
             Ok(provider) => {
-                info!("Metrics initialized successfully with endpoint: {}", config.metrics.endpoint);
+                info!(
+                    "Metrics initialized successfully with endpoint: {}",
+                    config.metrics.endpoint
+                );
                 Some(provider)
-            },
+            }
             Err(e) => {
                 tracing::error!("Failed to initialize metrics: {}", e);
                 return Err(e);
@@ -40,9 +48,12 @@ pub fn init_telemetry(config: &TelemetryConfig, resource: Resource) -> Result<(O
     let log_provider = if config.logs.enabled {
         match logs::init_logs(&config.logs, resource.clone()) {
             Ok(provider) => {
-                info!("Logs initialized successfully with endpoint: {}", config.logs.endpoint);
+                info!(
+                    "Logs initialized successfully with endpoint: {}",
+                    config.logs.endpoint
+                );
                 Some(provider)
-            },
+            }
             Err(e) => {
                 tracing::error!("Failed to initialize logs: {}", e);
                 return Err(e);
@@ -83,8 +94,7 @@ pub fn shutdown_telemetry(
 
 // Get the resource for telemetry with global labels
 pub fn build_resource(service_name: String, attributes: Vec<KeyValue>) -> Resource {
-    let mut resource_builder = Resource::builder()
-        .with_service_name(service_name);
+    let mut resource_builder = Resource::builder().with_service_name(service_name);
 
     // Add all global labels to the resource
     for attribute in attributes {

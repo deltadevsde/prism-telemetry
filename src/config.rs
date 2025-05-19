@@ -47,7 +47,6 @@ pub struct TelemetryLabels {
     pub labels: HashMap<String, String>,
 }
 
-
 // Configuration for telemetry components
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TelemetryConfig {
@@ -57,7 +56,6 @@ pub struct TelemetryConfig {
     pub profiles: ProfilesConfig,
     pub global_labels: TelemetryLabels,
 }
-
 
 pub fn get_default_telemetry_config() -> TelemetryConfig {
     TelemetryConfig {

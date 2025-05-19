@@ -1,18 +1,23 @@
-use opentelemetry_otlp::{MetricExporter, Protocol, WithExportConfig, WithHttpConfig};
-use opentelemetry_sdk::metrics::SdkMeterProvider;
-use opentelemetry_sdk::Resource;
-use std::error::Error;
-use tracing::{info, error};
 use base64;
 use base64::Engine;
+use opentelemetry_otlp::{MetricExporter, Protocol, WithExportConfig, WithHttpConfig};
+use opentelemetry_sdk::Resource;
+use opentelemetry_sdk::metrics::SdkMeterProvider;
 use std::collections::HashMap;
+use std::error::Error;
 use std::time::Duration;
+use tracing::{error, info};
 
 use crate::config::MetricsConfig;
 
-pub fn init_metrics(metrics_config: &MetricsConfig, resource: Resource) -> Result<SdkMeterProvider, Box<dyn Error + Send + Sync + 'static>> {
+pub fn init_metrics(
+    metrics_config: &MetricsConfig,
+    resource: Resource,
+) -> Result<SdkMeterProvider, Box<dyn Error + Send + Sync + 'static>> {
     // Build the complete endpoint URL with proper path handling
-    let endpoint_url = if metrics_config.endpoint.ends_with("v1/metrics") || metrics_config.endpoint.ends_with("v1/metrics/") {
+    let endpoint_url = if metrics_config.endpoint.ends_with("v1/metrics")
+        || metrics_config.endpoint.ends_with("v1/metrics/")
+    {
         metrics_config.endpoint.to_string()
     } else if metrics_config.endpoint.ends_with('/') {
         format!("{}v1/metrics", metrics_config.endpoint)
@@ -31,7 +36,10 @@ pub fn init_metrics(metrics_config: &MetricsConfig, resource: Resource) -> Resul
 
     // Add basic authentication if enabled
     if metrics_config.auth.enabled {
-        let auth_string = format!("{}:{}", metrics_config.auth.username, metrics_config.auth.password);
+        let auth_string = format!(
+            "{}:{}",
+            metrics_config.auth.username, metrics_config.auth.password
+        );
         let encoded = base64::engine::general_purpose::STANDARD.encode(auth_string);
         let auth_header = format!("Basic {}", encoded);
 
@@ -43,9 +51,14 @@ pub fn init_metrics(metrics_config: &MetricsConfig, resource: Resource) -> Resul
     let exporter = match builder.build() {
         Ok(exporter) => exporter,
         Err(e) => {
-            error!("Failed to build metric exporter: {}. Metrics will not be sent to backend.", e);
-            return Err(Box::new(std::io::Error::other(
-                format!("Failed to build metric exporter: {}", e))));
+            error!(
+                "Failed to build metric exporter: {}. Metrics will not be sent to backend.",
+                e
+            );
+            return Err(Box::new(std::io::Error::other(format!(
+                "Failed to build metric exporter: {}",
+                e
+            ))));
         }
     };
 
