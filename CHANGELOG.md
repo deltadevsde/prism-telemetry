@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/deltadevsde/prism-telemetry/compare/v0.1.0...v0.2.0) - 2025-05-19
+
+### Added
+
+- [**breaking**] dont expose KeyValue ([#6](https://github.com/deltadevsde/prism-telemetry/pull/6))
+- *(ci)* enable dependabot ([#4](https://github.com/deltadevsde/prism-telemetry/pull/4))
+
 ## [0.1.0](https://github.com/deltadevsde/prism-telemetry/releases/tag/v0.1.0) - 2025-05-19
 
 ### Added
