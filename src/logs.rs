@@ -59,10 +59,7 @@ pub fn init_logs(
                 "Failed to build log exporter: {}. Logs will only be available locally.",
                 e
             );
-            return Err(Box::new(std::io::Error::other(format!(
-                "Failed to build log exporter: {}",
-                e
-            ))));
+            return Err(Box::new(e));
         }
     };
 

@@ -18,7 +18,7 @@ lazy_static! {
 pub fn init_telemetry(
     config: &TelemetryConfig,
     resource: Resource,
-) -> Result<(Option<SdkMeterProvider>, Option<SdkLoggerProvider>), Box<dyn Error>> {
+) -> Result<(Option<SdkMeterProvider>, Option<SdkLoggerProvider>), Box<dyn Error + Send + Sync + 'static>> {
     info!(
         "Initializing telemetry with configuration: metrics_enabled={}, logs_enabled={}",
         config.metrics.enabled, config.logs.enabled
