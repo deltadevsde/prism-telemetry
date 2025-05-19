@@ -18,4 +18,3 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter", "registry",
 base64 = "0.22.0"
 serde = { version = "1.0.151", features = ["derive"] }
 lazy_static = "1.4.0"
-parking_lot = "0.12"
