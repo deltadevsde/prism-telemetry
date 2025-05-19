@@ -12,7 +12,7 @@ use std::sync::Mutex;
 use tracing::info;
 
 lazy_static! {
-    static ref GLOBAL_ATTRIBUTES: Mutex<Vec<KeyValue>> = Mutex::new(Vec::new());
+    static ref GLOBAL_ATTRIBUTES: Mutex<Vec<(String, String)>> = Mutex::new(Vec::new());
 }
 
 pub fn init_telemetry(
@@ -93,18 +93,18 @@ pub fn shutdown_telemetry(
 }
 
 // Get the resource for telemetry with global labels
-pub fn build_resource(service_name: String, attributes: Vec<KeyValue>) -> Resource {
+pub fn build_resource(service_name: String, attributes: Vec<(String, String)>) -> Resource {
     let mut resource_builder = Resource::builder().with_service_name(service_name);
 
     // Add all global labels to the resource
-    for attribute in attributes {
-        resource_builder = resource_builder.with_attribute(attribute);
+    for (key, value) in attributes {
+        resource_builder = resource_builder.with_attribute(KeyValue::new(key, value));
     }
 
     resource_builder.build()
 }
 
-pub fn set_global_attributes(attributes: Vec<KeyValue>) {
+pub fn set_global_attributes(attributes: Vec<(String, String)>) {
     if let Ok(mut global_attrs) = GLOBAL_ATTRIBUTES.lock() {
         *global_attrs = attributes;
     } else {
@@ -113,13 +113,17 @@ pub fn set_global_attributes(attributes: Vec<KeyValue>) {
 }
 
 pub fn build_attributes(attributes: Vec<(String, String)>) -> Vec<KeyValue> {
-    let mut new_attrs = match GLOBAL_ATTRIBUTES.lock() {
+    let global_attrs = match GLOBAL_ATTRIBUTES.lock() {
         Ok(global_attrs) => global_attrs.clone(),
         Err(_) => {
             tracing::error!("Failed to acquire lock for reading global attributes");
             Vec::new()
         }
     };
-    new_attrs.extend(attributes.into_iter().map(|(k, v)| KeyValue::new(k, v)));
-    new_attrs
+    let key_values: Vec<KeyValue> = global_attrs
+        .into_iter()
+        .chain(attributes.into_iter())
+        .map(|(k, v)| KeyValue::new(k, v))
+        .collect();
+    key_values
 }
